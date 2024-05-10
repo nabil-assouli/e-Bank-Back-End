@@ -1,7 +1,8 @@
 package com.example.bankappapplication.controller;
 
+import com.example.bankappapplication.dto.OperationDTO;
 import com.example.bankappapplication.exception.InsufficientFundsException;
-import com.example.bankappapplication.model.Operation;
+import com.example.bankappapplication.mapper.OperationMapper;
 import com.example.bankappapplication.service.OperationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,32 +19,40 @@ public class OperationController {
     @Autowired
     private OperationService operationService;
 
+    @Autowired
+    private OperationMapper operationMapper;
+
     @PostMapping("/deposit/{accountId}")
-    public ResponseEntity<Operation> deposit(@PathVariable String accountId, @RequestBody Map<String, Double> requestBody) {
+    public ResponseEntity<OperationDTO> deposit(@PathVariable String accountId, @RequestBody Map<String, Double> requestBody) {
         double amount = requestBody.get("amount");
-        return ResponseEntity.ok(operationService.deposit(accountId, amount));
+        OperationDTO operationDTO = operationService.deposit(accountId, amount);
+        return ResponseEntity.ok(operationDTO);
     }
 
     @PostMapping("/withdraw/{accountId}")
-    public ResponseEntity<Operation> withdraw(@PathVariable String accountId, @RequestBody Map<String, Double> requestBody) {
+    public ResponseEntity<OperationDTO> withdraw(@PathVariable String accountId, @RequestBody Map<String, Double> requestBody) {
         double amount = requestBody.get("amount");
-        return ResponseEntity.ok(operationService.withdraw(accountId, amount));
+        OperationDTO operationDTO = operationService.withdraw(accountId, amount);
+        return ResponseEntity.ok(operationDTO);
     }
 
     @PostMapping("/transfer/{fromAccountId}/{toAccountId}")
-    public ResponseEntity<Operation> transfer(@PathVariable String fromAccountId, @PathVariable String toAccountId, @RequestBody Map<String, Double> requestBody) {
+    public ResponseEntity<OperationDTO> transfer(@PathVariable String fromAccountId, @PathVariable String toAccountId, @RequestBody Map<String, Double> requestBody) {
         double amount = requestBody.get("amount");
-        return ResponseEntity.ok(operationService.transfer(fromAccountId, toAccountId, amount));
+        OperationDTO operationDTO = operationService.transfer(fromAccountId, toAccountId, amount);
+        return ResponseEntity.ok(operationDTO);
     }
 
     @GetMapping("/history/account/{accountId}")
-    public ResponseEntity<Iterable<Operation>> getAccountOperations(@PathVariable String accountId) {
-        return ResponseEntity.ok(operationService.getAccountOperations(accountId));
+    public ResponseEntity<List<OperationDTO>> getAccountOperations(@PathVariable String accountId) {
+        List<OperationDTO> operationDTOs = operationService.getAccountOperations(accountId);
+        return ResponseEntity.ok(operationDTOs);
     }
 
     @GetMapping("/history/customer/{customerId}")
-    public ResponseEntity<List<Operation>> getCustomerOperations(@PathVariable Long customerId) {
-        return ResponseEntity.ok(operationService.getCustomerOperations(customerId));
+    public ResponseEntity<List<OperationDTO>> getCustomerOperations(@PathVariable Long customerId) {
+        List<OperationDTO> operationDTOs = operationService.getCustomerOperations(customerId);
+        return ResponseEntity.ok(operationDTOs);
     }
 
     @ExceptionHandler(InsufficientFundsException.class)
